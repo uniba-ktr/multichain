@@ -31,6 +31,7 @@ RUN apt-get update \
         && rm -rf /var/lib/apt/lists/* \
         && cd /tmp \
         && git clone --branch ${VERSION} https://github.com/MultiChain/multichain.git \
+        && cd multichain \
         && mkdir v8build \
         && cd v8build \
         && curl -sSL -o linux-v8.tar.gz https://github.com/MultiChain/multichain-binaries/raw/master/linux-v8.tar.gz \
