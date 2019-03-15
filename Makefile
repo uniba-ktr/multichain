@@ -1,4 +1,4 @@
-ARCHITECTURES = amd64 i386 arm32v7 arm64v8 ppc64le s390x
+ARCHITECTURES = amd64 arm32v7 arm64v8 ppc64le
 IMAGE_TARGET = ubuntu:bionic
 MULTIARCH = multiarch/qemu-user-static:register
 QEMU_VERSION = v2.11.0
