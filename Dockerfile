@@ -12,7 +12,6 @@ FROM ${IMAGE} AS build
 ARG QEMU=x86_64
 COPY --from=qemu /qemu-${QEMU}-static /usr/bin/qemu-${QEMU}-static
 ARG ARCH=amd64
-ARG PROMETHEUS_ARCH=amd64
 ARG VERSION=master
 ARG BUILD_DATE
 ARG VCS_REF
