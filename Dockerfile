@@ -1,7 +1,22 @@
 ARG IMAGE=ubuntu:bionic
 
-FROM ${IMAGE}
-MAINTAINER Hendrik Cech <hendrik.cech@gmail.com>
+# first image to download qemu and make it executable
+FROM alpine AS qemu
+ARG QEMU=x86_64
+ARG QEMU_VERSION=v2.11.0
+ADD https://github.com/multiarch/qemu-user-static/releases/download/${QEMU_VERSION}/qemu-${QEMU}-static /qemu-${QEMU}-static
+RUN chmod +x /qemu-${QEMU}-static
+
+
+FROM ${IMAGE} AS build
+ARG QEMU=x86_64
+COPY --from=qemu /qemu-${QEMU}-static /usr/bin/qemu-${QEMU}-static
+ARG ARCH=amd64
+ARG PROMETHEUS_ARCH=amd64
+ARG VERSION=master
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VCS_URL
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -15,16 +30,15 @@ RUN apt-get update \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/* \
         && cd /tmp \
-        && git clone https://github.com/MultiChain/multichain.git
-RUN  cd /tmp/multichain \
+        && git clone --branch ${VERSION} https://github.com/MultiChain/multichain.git \
         && mkdir v8build \
         && cd v8build \
         && curl -sSL -o linux-v8.tar.gz https://github.com/MultiChain/multichain-binaries/raw/master/linux-v8.tar.gz \
         && tar xzf linux-v8.tar.gz \
         && cd .. \
         && ./autogen.sh \
-        && ./configure
-RUN make \
+        && ./configure \
+        && make \
         && mv src/multichaind src/multichain-cli src/multichain-util /usr/local/bin \
         && rm -Rf /tmp/multichain* \
         && apt-get purge -q -y \
@@ -47,3 +61,12 @@ RUN make \
 # Works!
 
 CMD ["/bin/bash"]
+
+LABEL de.uniba.ktr.multicahin.version=$VERSION \
+      de.uniba.ktr.multicahin.name="Multichain" \
+      de.uniba.ktr.multicahin.docker.cmd="docker run --name=multichain unibaktr/multichain multichain-cli" \
+      de.uniba.ktr.multicahin.vendor="Marcel Grossmann" \
+      de.uniba.ktr.multicahin.architecture=$ARCH \
+      de.uniba.ktr.multicahin.vcs-ref=$VCS_REF \
+      de.uniba.ktr.multicahin.vcs-url=$VCS_URL \
+      de.uniba.ktr.multicahin.build-date=$BUILD_DATE
