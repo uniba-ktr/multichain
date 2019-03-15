@@ -46,7 +46,7 @@ jobs:
         - run:
             name: Build image for arm64v8
             command: make ARCHITECTURES=arm64v8
-              no_output_timeout: 60m
+            no_output_timeout: 60m
         - deploy:
             name: Push image for arm64v8 to dockerhub
             command: make ARCHITECTURES=arm64v8 push
